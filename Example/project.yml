@@ -1,0 +1,36 @@
+name: MenuBarKitDemo
+options:
+  bundleIdPrefix: io.github.halilozel1903
+  deploymentTarget:
+    macOS: "14.0"
+packages:
+  MenuBarKit:
+    path: ..
+targets:
+  MenuBarKitDemo:
+    type: application
+    platform: macOS
+    sources:
+      - MenuBarKitDemo
+    dependencies:
+      - package: MenuBarKit
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: io.github.halilozel1903.MenuBarKitDemo
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_CFBundleDisplayName: Tempo
+        INFOPLIST_KEY_LSUIElement: YES
+        INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.productivity
+        INFOPLIST_KEY_NSHumanReadableCopyright: "© 2026 Halil Özel"
+        MARKETING_VERSION: "1.2"
+        CURRENT_PROJECT_VERSION: "34"
+        SWIFT_VERSION: "6.0"
+        ENABLE_HARDENED_RUNTIME: NO
+        CODE_SIGN_IDENTITY: "-"
+schemes:
+  MenuBarKitDemo:
+    build:
+      targets:
+        MenuBarKitDemo: all
+    run:
+      config: Debug
