@@ -6,11 +6,11 @@
 # A real menu bar window cannot be opened reliably on a CI runner, so the app shows each scene in a
 # regular window of a fixed size when launched with `-screenshot <scene>`.
 #
-# 1. Preferred: `-render-screenshot <file>` makes the app draw that window's content into a PNG itself
-#    (NSView.cacheDisplay at 2x) and quit. No Screen Recording permission is involved, which GitHub's
-#    macOS runners do not reliably grant.
-# 2. Fallback: `screencapture -l <window id>` of the app's window, with the id looked up by
+# 1. Preferred: `screencapture -l <window id>` of the app's borderless window, with the id looked up by
 #    scripts/window-id.swift (CGWindowListCopyWindowInfo, filtered by the app's process id).
+# 2. Fallback: `-render-screenshot <file>` makes the app draw that window's content into a PNG itself
+#    (NSView.cacheDisplay at 2x) and quit. It needs no Screen Recording permission, but it cannot
+#    draw tab views and grouped forms.
 set -euo pipefail
 
 SCHEME="$1"; shift
@@ -99,19 +99,21 @@ previous=""
 for scene in "$@"; do
   capture="$TMP/$scene.png"
   ok=0
+  # screencapture draws exactly what is on screen, including tab views and forms that
+  # cacheDisplay leaves empty, so it goes first; the app's own renderer is the fallback.
   for attempt in 1 2; do
-    rm -f "$capture"
-    if render "$scene" "$capture" && valid_capture "$capture" "$previous"; then
-      ok=1
-      break
-    fi
-    echo "Rendering $scene failed or produced a blank image (attempt $attempt)"
-  done
-  if [ "$ok" -ne 1 ]; then
-    echo "Falling back to screencapture for $scene"
     rm -f "$capture"
     capture_window "$scene" "$capture"
     if valid_capture "$capture" "$previous"; then
+      ok=1
+      break
+    fi
+    echo "screencapture of $scene failed or was blank (attempt $attempt)"
+  done
+  if [ "$ok" -ne 1 ]; then
+    echo "Falling back to the app's own renderer for $scene"
+    rm -f "$capture"
+    if render "$scene" "$capture" && valid_capture "$capture" "$previous"; then
       ok=1
     fi
   fi

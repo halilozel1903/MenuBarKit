@@ -143,19 +143,15 @@ final class ScreenshotWindow {
             model.timer.showPausedSession(remaining: 18 * 60 + 42)
         }
 
-        // A normal (not borderless) window, with the title bar hidden so the content fills it.
+        // A borderless window: no title bar inset and no rounded window corners in the capture.
         window = NSWindow(
             contentRect: NSRect(origin: .zero, size: scene.size),
-            styleMask: [.titled, .fullSizeContentView],
+            styleMask: [.borderless],
             backing: .buffered,
             defer: false
         )
         window.title = "Tempo – \(scene.rawValue)"
-        window.titleVisibility = .hidden
-        window.titlebarAppearsTransparent = true
-        for button in [NSWindow.ButtonType.closeButton, .miniaturizeButton, .zoomButton] {
-            window.standardWindowButton(button)?.isHidden = true
-        }
+        window.hasShadow = false
         window.appearance = NSAppearance(named: .aqua)
         window.isReleasedWhenClosed = false
         window.contentView = NSHostingView(rootView: AnyView(
