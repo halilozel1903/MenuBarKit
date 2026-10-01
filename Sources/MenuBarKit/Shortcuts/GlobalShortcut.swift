@@ -35,7 +35,7 @@ public final class GlobalShortcut: ObservableObject, Identifiable {
     /// Set when the shortcut could not be registered, for example because another app owns it.
     @Published public private(set) var errorMessage: String?
 
-    public var id: String { name }
+    nonisolated public var id: String { name }
 
     private let defaults: UserDefaults
     private let action: () -> Void
